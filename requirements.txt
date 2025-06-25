@@ -1,0 +1,45 @@
+# Python dependencies untuk App Recommendation System
+
+# Kafka dan Streaming
+kafka-python
+
+# Data Processing
+pandas
+numpy
+pyarrow
+
+# MinIO S3 Storage
+minio
+
+# Database dan Query
+trino
+sqlalchemy
+
+# Machine Learning
+pyspark
+scikit-learn
+
+# Visualization
+plotly
+seaborn
+matplotlib
+
+# Web Framework
+streamlit
+streamlit-autorefresh
+
+# Utilities
+python-dotenv
+requests
+tqdm
+
+# System monitoring
+docker
+psutil
+
+# Development
+jupyter
+notebook
+
+# Optional: For production deployment
+gunicorn

@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>App Recommendation System</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --primary-color: #4285f4;
+        --secondary-color: #34a853;
+        --accent-color: #fbbc04;
+        --danger-color: #ea4335;
+      }
+
+      body {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      }
+
+      .main-container {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        margin: 20px 0;
+        padding: 30px;
+      }
+
+      .header-section {
+        text-align: center;
+        margin-bottom: 40px;
+      }
+
+      .header-title {
+        background: linear-gradient(
+          45deg,
+          var(--primary-color),
+          var(--secondary-color)
+        );
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-weight: bold;
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+      }
+
+      .search-section {
+        background: white;
+        border-radius: 15px;
+        padding: 25px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        margin-bottom: 30px;
+      }
+
+      .recommendation-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        border: none;
+        margin-bottom: 20px;
+        overflow: hidden;
+      }
+
+      .recommendation-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+      }
+
+      .card-header {
+        background: linear-gradient(
+          45deg,
+          var(--primary-color),
+          var(--secondary-color)
+        );
+        color: white;
+        border: none;
+        padding: 15px 20px;
+      }
+
+      .badge-custom {
+        background: var(--accent-color);
+        color: #333;
+        font-weight: 600;
+      }
+
+      .rating-stars {
+        color: var(--accent-color);
+      }
+
+      .btn-primary-custom {
+        background: linear-gradient(
+          45deg,
+          var(--primary-color),
+          var(--secondary-color)
+        );
+        border: none;
+        border-radius: 25px;
+        padding: 10px 25px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+      }
+
+      .btn-primary-custom:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(66, 133, 244, 0.3);
+      }
+
+      .loading-spinner {
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid var(--primary-color);
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+        margin: 20px auto;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      .stats-card {
+        background: white;
+        border-radius: 15px;
+        padding: 20px;
+        text-align: center;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+      }
+
+      .stats-number {
+        font-size: 2rem;
+        font-weight: bold;
+        color: var(--primary-color);
+      }
+
+      .similarity-score {
+        background: linear-gradient(
+          45deg,
+          var(--secondary-color),
+          var(--accent-color)
+        );
+        color: white;
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+      }
+
+      .genre-tag {
+        background: var(--primary-color);
+        color: white;
+        padding: 5px 12px;
+        border-radius: 15px;
+        font-size: 0.8rem;
+        margin-right: 5px;
+        display: inline-block;
+        margin-bottom: 5px;
+      }
+
+      .price-tag {
+        background: var(--secondary-color);
+        color: white;
+        padding: 3px 8px;
+        border-radius: 10px;
+        font-size: 0.7rem;
+        font-weight: 600;
+      }
+
+      .free-tag {
+        background: var(--accent-color);
+        color: #333;
+        padding: 3px 8px;
+        border-radius: 10px;
+        font-size: 0.7rem;
+        font-weight: 600;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="main-container">
+        <!-- Header -->
+        <div class="header-section">
+          <h1 class="header-title">
+            <i class="fas fa-mobile-alt"></i>
+            App Recommendation System
+          </h1>
+          <p class="lead text-muted">
+            Discover amazing apps tailored just for you using AI-powered
+            recommendations
+          </p>
+        </div>
+
+        <!-- Statistics Section -->
+        <div class="row mb-4" id="statsSection" style="display: none">
+          <div class="col-md-3">
+            <div class="stats-card">
+              <div class="stats-number" id="totalApps">-</div>
+              <div class="text-muted">Total Apps</div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="stats-card">
+              <div class="stats-number" id="freeApps">-</div>
+              <div class="text-muted">Free Apps</div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="stats-card">
+              <div class="stats-number" id="avgScore">-</div>
+              <div class="text-muted">Avg Score</div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="stats-card">
+              <div class="stats-number" id="totalGenres">-</div>
+              <div class="text-muted">Categories</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Search Section -->
+        <div class="search-section">
+          <div class="row">
+            <div class="col-md-8">
+              <h4 class="mb-3">
+                <i class="fas fa-search"></i> Find Your Perfect App
+              </h4>
+
+              <!-- Search Tabs -->
+              <ul class="nav nav-pills mb-3" id="searchTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                  <button
+                    class="nav-link active"
+                    id="title-tab"
+                    data-bs-toggle="pill"
+                    data-bs-target="#title-search"
+                    type="button"
+                  >
+                    <i class="fas fa-search"></i> By App Name
+                  </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                  <button
+                    class="nav-link"
+                    id="hybrid-tab"
+                    data-bs-toggle="pill"
+                    data-bs-target="#hybrid-search"
+                    type="button"
+                  >
+                    <i class="fas fa-brain"></i> Smart Hybrid
+                  </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                  <button
+                    class="nav-link"
+                    id="genre-tab"
+                    data-bs-toggle="pill"
+                    data-bs-target="#genre-search"
+                    type="button"
+                  >
+                    <i class="fas fa-tags"></i> By Category
+                  </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                  <button
+                    class="nav-link"
+                    id="popular-tab"
+                    data-bs-toggle="pill"
+                    data-bs-target="#popular-search"
+                    type="button"
+                  >
+                    <i class="fas fa-fire"></i> Popular Apps
+                  </button>
+                </li>
+              </ul>
+
+              <!-- Search Content -->
+              <div class="tab-content" id="searchTabContent">
+                <!-- Title Search -->
+                <div class="tab-pane fade show active" id="title-search">
+                  <div class="mb-3">
+                    <label for="recommendationMethod" class="form-label"
+                      >Recommendation Method:</label
+                    >
+                    <select class="form-select mb-2" id="recommendationMethod">
+                      <option value="tfidf_basic">TF-IDF Basic</option>
+                      <option value="tfidf_ngram">
+                        TF-IDF N-gram (Better)
+                      </option>
+                      <option value="linear">Linear Similarity</option>
+                      <option value="combined">Combined Features (Best)</option>
+                    </select>
+                  </div>
+                  <div class="input-group mb-3">
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="appTitleInput"
+                      placeholder="Enter app name (e.g., 'Photo Editor', 'Music Player', 'Calculator')"
+                    />
+                    <button
+                      class="btn btn-primary-custom"
+                      onclick="searchByTitle()"
+                    >
+                      <i class="fas fa-search"></i> Get Recommendations
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Hybrid Search -->
+                <div class="tab-pane fade" id="hybrid-search">
+                  <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i>
+                    <strong>Smart Hybrid:</strong> Combines multiple AI models
+                    for the best recommendations
+                  </div>
+                  <div class="input-group mb-3">
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="hybridTitleInput"
+                      placeholder="Enter app name for smart recommendations"
+                    />
+                    <button
+                      class="btn btn-primary-custom"
+                      onclick="searchHybrid()"
+                    >
+                      <i class="fas fa-brain"></i> Smart Recommendations
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Genre Search -->
+                <div class="tab-pane fade" id="genre-search">
+                  <div class="input-group mb-3">
+                    <select class="form-select" id="genreSelect">
+                      <option value="">Select a category...</option>
+                      <option value="Art & Design">Art & Design</option>
+                      <option value="Games">Games</option>
+                      <option value="Photography">Photography</option>
+                      <option value="Productivity">Productivity</option>
+                      <option value="Social">Social</option>
+                      <option value="Entertainment">Entertainment</option>
+                      <option value="Music & Audio">Music & Audio</option>
+                      <option value="Education">Education</option>
+                      <option value="Health & Fitness">Health & Fitness</option>
+                      <option value="Shopping">Shopping</option>
+                    </select>
+                    <button
+                      class="btn btn-primary-custom"
+                      onclick="searchByGenre()"
+                    >
+                      <i class="fas fa-filter"></i> Find Apps
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Popular Apps -->
+                <div class="tab-pane fade" id="popular-search">
+                  <button
+                    class="btn btn-primary-custom btn-lg me-3"
+                    onclick="getPopularApps()"
+                  >
+                    <i class="fas fa-fire"></i> Show Popular Apps
+                  </button>
+                  <button
+                    class="btn btn-outline-primary btn-lg"
+                    onclick="getEnhancedPopular()"
+                  >
+                    <i class="fas fa-star"></i> Enhanced Popular
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <h5 class="mb-3"><i class="fas fa-lightbulb"></i> Quick Tips</h5>
+              <ul class="list-unstyled">
+                <li class="mb-2">
+                  <i class="fas fa-check text-success"></i> Try searching for
+                  specific app names
+                </li>
+                <li class="mb-2">
+                  <i class="fas fa-check text-success"></i> Browse by your
+                  favorite categories
+                </li>
+                <li class="mb-2">
+                  <i class="fas fa-check text-success"></i> Discover trending
+                  popular apps
+                </li>
+                <li class="mb-2">
+                  <i class="fas fa-check text-success"></i> All recommendations
+                  use AI similarity
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Loading Indicator -->
+        <div id="loadingIndicator" style="display: none">
+          <div class="loading-spinner"></div>
+          <p class="text-center">Finding perfect apps for you...</p>
+        </div>
+
+        <!-- Results Section -->
+        <div id="resultsSection" style="display: none">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <h3 id="resultsTitle">
+              <i class="fas fa-list"></i> Recommendations
+            </h3>
+            <span id="resultsCount" class="badge badge-custom"></span>
+          </div>
+          <div id="recommendationsList" class="row"></div>
+        </div>
+
+        <!-- No Results -->
+        <div id="noResults" style="display: none" class="text-center">
+          <i class="fas fa-search fa-3x text-muted mb-3"></i>
+          <h4 class="text-muted">No apps found</h4>
+          <p class="text-muted">
+            Try a different search term or browse by category
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+      // API Base URL
+      const API_BASE = "/api";
+
+      // Load statistics on page load
+      document.addEventListener("DOMContentLoaded", function () {
+        loadStats();
+      });
+
+      // Load statistics
+      async function loadStats() {
+        try {
+          const response = await fetch(`${API_BASE}/stats`);
+          const data = await response.json();
+
+          if (data.error) {
+            console.error("Error loading stats:", data.error);
+            return;
+          }
+
+          document.getElementById("totalApps").textContent =
+            data.total_apps.toLocaleString();
+          document.getElementById("freeApps").textContent =
+            data.free_apps.toLocaleString();
+          document.getElementById("avgScore").textContent =
+            data.avg_score.toFixed(1);
+          document.getElementById("totalGenres").textContent = Object.keys(
+            data.top_genres
+          ).length;
+
+          document.getElementById("statsSection").style.display = "block";
+        } catch (error) {
+          console.error("Error loading stats:", error);
+        }
+      }
+
+      // Search by title with method selection
+      async function searchByTitle() {
+        const title = document.getElementById("appTitleInput").value.trim();
+        const method = document.getElementById("recommendationMethod").value;
+
+        if (!title) {
+          alert("Please enter an app name");
+          return;
+        }
+
+        showLoading();
+
+        try {
+          const response = await fetch(`${API_BASE}/recommend/title`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              title: title,
+              method: method,
+              num_recommendations: 12,
+            }),
+          });
+
+          const data = await response.json();
+
+          if (data.error) {
+            showNoResults();
+            return;
+          }
+
+          displayRecommendations(
+            data.recommendations,
+            `${data.method.toUpperCase()} recommendations for "${
+              data.found_app
+            }"`
+          );
+        } catch (error) {
+          console.error("Error:", error);
+          showNoResults();
+        }
+      }
+
+      // Search using hybrid method
+      async function searchHybrid() {
+        const title = document.getElementById("hybridTitleInput").value.trim();
+
+        if (!title) {
+          alert("Please enter an app name");
+          return;
+        }
+
+        showLoading();
+
+        try {
+          const response = await fetch(`${API_BASE}/recommend/hybrid`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              title: title,
+              num_recommendations: 12,
+            }),
+          });
+
+          const data = await response.json();
+
+          if (data.error) {
+            showNoResults();
+            return;
+          }
+
+          displayRecommendations(
+            data.recommendations,
+            `Smart Hybrid recommendations for "${data.found_app}"`
+          );
+        } catch (error) {
+          console.error("Error:", error);
+          showNoResults();
+        }
+      }
+
+      // Get enhanced popular apps
+      async function getEnhancedPopular() {
+        showLoading();
+
+        try {
+          const response = await fetch(
+            `${API_BASE}/recommend/popular?num_recommendations=12`
+          );
+          const data = await response.json();
+
+          if (data.error) {
+            showNoResults();
+            return;
+          }
+
+          displayRecommendations(
+            data.recommendations,
+            "Enhanced Popular Apps (AI-Ranked)"
+          );
+        } catch (error) {
+          console.error("Error:", error);
+          showNoResults();
+        }
+      }
+
+      // Search by genre
+      async function searchByGenre() {
+        const genre = document.getElementById("genreSelect").value;
+
+        if (!genre) {
+          alert("Please select a category");
+          return;
+        }
+
+        showLoading();
+
+        try {
+          const response = await fetch(`${API_BASE}/recommend/genre`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              genre: genre,
+              num_recommendations: 12,
+            }),
+          });
+
+          const data = await response.json();
+
+          if (data.error) {
+            showNoResults();
+            return;
+          }
+
+          displayRecommendations(data.recommendations, `Best in ${genre}`);
+        } catch (error) {
+          console.error("Error:", error);
+          showNoResults();
+        }
+      }
+
+      // Get popular apps
+      async function getPopularApps() {
+        showLoading();
+
+        try {
+          const response = await fetch(
+            `${API_BASE}/recommend/popular?num_recommendations=12`
+          );
+          const data = await response.json();
+
+          if (data.error) {
+            showNoResults();
+            return;
+          }
+
+          displayRecommendations(data.recommendations, "Most Popular Apps");
+        } catch (error) {
+          console.error("Error:", error);
+          showNoResults();
+        }
+      }
+
+      // Display recommendations
+      function displayRecommendations(recommendations, title) {
+        hideLoading();
+
+        if (!recommendations || recommendations.length === 0) {
+          showNoResults();
+          return;
+        }
+
+        document.getElementById(
+          "resultsTitle"
+        ).innerHTML = `<i class="fas fa-list"></i> ${title}`;
+        document.getElementById(
+          "resultsCount"
+        ).textContent = `${recommendations.length} apps found`;
+
+        const recommendationsList = document.getElementById(
+          "recommendationsList"
+        );
+        recommendationsList.innerHTML = "";
+
+        recommendations.forEach((app, index) => {
+          const card = createAppCard(app, index);
+          recommendationsList.appendChild(card);
+        });
+
+        document.getElementById("resultsSection").style.display = "block";
+        document.getElementById("noResults").style.display = "none";
+
+        // Scroll to results
+        document
+          .getElementById("resultsSection")
+          .scrollIntoView({ behavior: "smooth" });
+      }
+
+      // Create app card
+      function createAppCard(app, index) {
+        const col = document.createElement("div");
+        col.className = "col-lg-6 col-xl-4";
+
+        const stars = generateStars(app.score);
+        const priceTag = app.free
+          ? '<span class="free-tag">FREE</span>'
+          : `<span class="price-tag">$${app.price.toFixed(2)}</span>`;
+
+        const similarityBadge = app.similarity_score
+          ? `<span class="similarity-score">${(
+              app.similarity_score * 100
+            ).toFixed(0)}% match</span>`
+          : "";
+
+        col.innerHTML = `
+                <div class="recommendation-card">
+                    <div class="card-header">
+                        <h6 class="mb-0 d-flex justify-content-between align-items-center">
+                            <span>#${index + 1}</span>
+                            ${similarityBadge}
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title text-primary">${app.title}</h5>
+                        <div class="mb-2">
+                            <span class="genre-tag">${app.genre}</span>
+                            ${priceTag}
+                        </div>
+                        <p class="text-muted mb-2">
+                            <i class="fas fa-user"></i> ${app.developer}
+                        </p>
+                        <div class="mb-3">
+                            <div class="d-flex align-items-center mb-1">
+                                <div class="rating-stars me-2">${stars}</div>
+                                <small class="text-muted">${app.score.toFixed(
+                                  1
+                                )} (${app.ratings.toLocaleString()} reviews)</small>
+                            </div>
+                        </div>
+                        <p class="card-text">${
+                          app.summary
+                            ? app.summary.substring(0, 120) + "..."
+                            : "No description available"
+                        }</p>
+                    </div>
+                </div>
+            `;
+
+        return col;
+      }
+
+      // Generate star rating
+      function generateStars(score) {
+        const fullStars = Math.floor(score);
+        const hasHalfStar = score % 1 >= 0.5;
+        let stars = "";
+
+        for (let i = 0; i < fullStars; i++) {
+          stars += '<i class="fas fa-star"></i>';
+        }
+
+        if (hasHalfStar) {
+          stars += '<i class="fas fa-star-half-alt"></i>';
+        }
+
+        const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+        for (let i = 0; i < emptyStars; i++) {
+          stars += '<i class="far fa-star"></i>';
+        }
+
+        return stars;
+      }
+
+      // Show loading indicator
+      function showLoading() {
+        document.getElementById("loadingIndicator").style.display = "block";
+        document.getElementById("resultsSection").style.display = "none";
+        document.getElementById("noResults").style.display = "none";
+      }
+
+      // Hide loading indicator
+      function hideLoading() {
+        document.getElementById("loadingIndicator").style.display = "none";
+      }
+
+      // Show no results
+      function showNoResults() {
+        hideLoading();
+        document.getElementById("resultsSection").style.display = "none";
+        document.getElementById("noResults").style.display = "block";
+      }
+
+      // Enter key support for search
+      document
+        .getElementById("appTitleInput")
+        .addEventListener("keypress", function (e) {
+          if (e.key === "Enter") {
+            searchByTitle();
+          }
+        });
+    </script>
+  </body>
+</html>
