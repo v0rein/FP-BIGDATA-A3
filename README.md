@@ -1,6 +1,9 @@
-# FP-Bigdata-A3
+# App Recommendation System - Big Data & Data Lakehouse
+## Final Project Big Data & Data Lakehosue
 
-## Anggota Kelompok
+Aplikasi rekomendasi aplikasi Android dengan arsitektur big data dan data lakehouse menggunakan teknologi modern untuk streaming, storage, dan machine learning.
+
+## Anggota Kelompok (A3)
 | No             | Nama | NRP |
 | :---------------- | :------ | :---- |
 | 1        |   Nafi Firdaus    | 5027231045 |
@@ -14,7 +17,7 @@
 | Dataset             | Jenis | Link |
 | :---------------- | :------ | :---- |
 | Google Play Apps and Games (3.4M)        |   Structured    | https://www.kaggle.com/datasets/tapive/google-play-apps-and-games |
-| Google Play Apps and Games (3.4M) (Summary Column)           |   Semi unstructured   | https://www.kaggle.com/datasets/tapive/google-play-apps-and-games |
+| Google Play Apps and Games (3.4M) (Summary Column)           |   Unstructured   | https://www.kaggle.com/datasets/tapive/google-play-apps-and-games |
 
 ## Latar Belakang Masalah
 Google Play Store memiliki lebih dari 3 juta aplikasi, namun hanya sebagian kecil yang mendapatkan visibilitas tinggi. Sebagian besar pengguna:
@@ -30,10 +33,6 @@ Banyak aplikasi bagus tidak terekspos ke pengguna yang tepat, menyebabkan rendah
 - Menerapkan Arsitektur Data Lakehouse Menggunakan Kafka (streaming), MinIO (storage), Hive (metastore), dan Spark (analitik).
 - Mengintegrasikan Antarmuka Web Interaktif Website berbasis Streamlit yang memungkinkan pengguna
 - Mengatasi Ketimpangan Eksposur Aplikasi Long-Tail Dengan rekomendasi otomatis berdasarkan fitur konten, klasifikasi kategori, dan analisis deskriptif.
-
-# App Recommendation System - Big Data & Data Lakehouse
-
-Aplikasi rekomendasi aplikasi Android dengan arsitektur big data dan data lakehouse menggunakan teknologi modern untuk streaming, storage, dan machine learning.
 
 ## Arsitektur Sistem
 
@@ -346,27 +345,3 @@ trino --server localhost:8086 --catalog hive --schema app_recommendations
 - [ ] Multi-tenant support
 - [ ] Advanced security features
 - [ ] API endpoints untuk external integration
-
-## Contributing
-
-1. Fork repository
-2. Create feature branch
-3. Commit changes
-4. Push ke branch
-5. Create Pull Request
-
-## License
-
-MIT License - see LICENSE file for details
-
-## Support
-
-Untuk pertanyaan atau issues:
-
-1. Check troubleshooting section
-2. Review logs untuk error messages
-3. Create GitHub issue dengan detail error
-
----
-
-**Dibuat untuk Final Project Big Data dan Data Lakehouse** 🎓
