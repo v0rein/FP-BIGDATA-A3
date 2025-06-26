@@ -1,8 +1,41 @@
-# 📱 App Recommendation System - Big Data & Data Lakehouse
+# FP-Bigdata-A3
+
+## Anggota Kelompok
+| No             | Nama | NRP |
+| :---------------- | :------ | :---- |
+| 1        |   Nafi Firdaus    | 5027231045 |
+| 2           |   Tio Axelino   | 5027231065 |
+| 3    |  Dionisius Marcel   | 5027231044 |
+| 4 |  Fikri Aulia As Sa'adi   | 5027231026 |
+| 5 |  Muhammad Andrean Rizq Prasetio    | 5027231052 |
+
+## Dataset
+
+| Dataset             | Jenis | Link |
+| :---------------- | :------ | :---- |
+| Google Play Apps and Games (3.4M)        |   Structured    | https://www.kaggle.com/datasets/tapive/google-play-apps-and-games |
+| Google Play Apps and Games (3.4M) (Summary Column)           |   Semi unstructured   | https://www.kaggle.com/datasets/tapive/google-play-apps-and-games |
+
+## Latar Belakang Masalah
+Google Play Store memiliki lebih dari 3 juta aplikasi, namun hanya sebagian kecil yang mendapatkan visibilitas tinggi. Sebagian besar pengguna:
+- Hanya melihat aplikasi populer atau yang ditampilkan di halaman utama
+- Tidak menemukan aplikasi yang relevan, unik, atau sesuai kebutuhan pribadi
+- Melewatkan aplikasi niche berkualitas tinggi karena kurangnya sistem rekomendasi yang menjangkau long-tail apps
+
+#### Permasalahan utama:
+Banyak aplikasi bagus tidak terekspos ke pengguna yang tepat, menyebabkan rendahnya jumlah unduhan dan potensi ekonomi yang tidak termanfaatkan.
+
+## Tujuan Proyek
+- Membangun Sistem Rekomendasi Aplikasi Otomatis Menggunakan machine learning untuk mencari aplikasi serupa berdasarkan fitur, nama, dan rating.
+- Menerapkan Arsitektur Data Lakehouse Menggunakan Kafka (streaming), MinIO (storage), Hive (metastore), dan Spark (analitik).
+- Mengintegrasikan Antarmuka Web Interaktif Website berbasis Streamlit yang memungkinkan pengguna
+- Mengatasi Ketimpangan Eksposur Aplikasi Long-Tail Dengan rekomendasi otomatis berdasarkan fitur konten, klasifikasi kategori, dan analisis deskriptif.
+
+# App Recommendation System - Big Data & Data Lakehouse
 
 Aplikasi rekomendasi aplikasi Android dengan arsitektur big data dan data lakehouse menggunakan teknologi modern untuk streaming, storage, dan machine learning.
 
-## 🏗️ Arsitektur Sistem
+## Arsitektur Sistem
 
 ```
 📁 Dataset → 🚀 Kafka Producer → 📡 Kafka Stream → 💾 MinIO Data Lake
@@ -21,7 +54,7 @@ Aplikasi rekomendasi aplikasi Android dengan arsitektur big data dan data lakeho
 5. **PySpark** - Machine learning dan big data processing
 6. **Streamlit** - Real-time dashboard dan visualisasi
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 
@@ -61,7 +94,7 @@ python ml_training.py
 - **MinIO Console**: http://localhost:9001
 - **Trino UI**: http://localhost:8086
 
-## 📊 Fitur Dashboard
+## Fitur Dashboard
 
 ### 1. Real-time Stream
 
@@ -90,7 +123,7 @@ python ml_training.py
 - Data flow visualization
 - System logs
 
-## 🤖 Machine Learning
+## Machine Learning
 
 ### Algoritma yang Digunakan:
 
@@ -111,7 +144,7 @@ python ml_training.py
 - **App Features**: Genre, rating, price, developer, install count
 - **Interaction Features**: View, download, rate, search patterns
 
-## 📁 Data Flow
+## Data Flow
 
 ### 1. Data Ingestion
 
@@ -142,7 +175,7 @@ MinIO Data → Historical Analytics
 ML Models → Recommendation Interface
 ```
 
-## 🗂️ Struktur Data
+## Struktur Data
 
 ### App Interactions Schema
 
@@ -173,7 +206,7 @@ ML Models → Recommendation Interface
 year=YYYY/month=MM/day=DD/hour=HH/batch_timestamp.parquet
 ```
 
-## 🔧 Konfigurasi
+## Konfigurasi
 
 ### Docker Services
 
@@ -205,7 +238,7 @@ KAFKA_BROKER_ID=1
 KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
 ```
 
-## 📈 Monitoring & Observability
+## Monitoring & Observability
 
 ### Key Metrics
 
@@ -222,7 +255,7 @@ KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
 - Model freshness checks
 - Storage capacity monitoring
 
-## 🛠️ Development
+## Development
 
 ### Menambah Fitur Baru
 
@@ -259,7 +292,7 @@ mc ls minio/app-recommendation-data
 trino --server localhost:8086 --catalog hive --schema app_recommendations
 ```
 
-## 🚨 Troubleshooting
+## Troubleshooting
 
 ### Common Issues
 
@@ -301,7 +334,7 @@ trino --server localhost:8086 --catalog hive --schema app_recommendations
 3. **Trino**: Tune `query.max-memory` dan `query.max-memory-per-node`
 4. **MinIO**: Use multiple drives untuk better I/O
 
-## 📋 TODO / Future Enhancements
+## TODO / Future Enhancements
 
 - [ ] Real-time model retraining
 - [ ] A/B testing framework
@@ -314,7 +347,7 @@ trino --server localhost:8086 --catalog hive --schema app_recommendations
 - [ ] Advanced security features
 - [ ] API endpoints untuk external integration
 
-## 🤝 Contributing
+## Contributing
 
 1. Fork repository
 2. Create feature branch
@@ -322,11 +355,11 @@ trino --server localhost:8086 --catalog hive --schema app_recommendations
 4. Push ke branch
 5. Create Pull Request
 
-## 📄 License
+## License
 
 MIT License - see LICENSE file for details
 
-## 🙋‍♂️ Support
+## Support
 
 Untuk pertanyaan atau issues:
 
