@@ -35,14 +35,7 @@ Banyak aplikasi bagus tidak terekspos ke pengguna yang tepat, menyebabkan rendah
 - Mengatasi Ketimpangan Eksposur Aplikasi Long-Tail Dengan rekomendasi otomatis berdasarkan fitur konten, klasifikasi kategori, dan analisis deskriptif.
 
 ## Arsitektur Sistem
-
-```
-📁 Dataset → 🚀 Kafka Producer → 📡 Kafka Stream → 💾 MinIO Data Lake
-                                         ↓
-📊 Streamlit Dashboard ← 🔍 Trino ← 🗃️ Hive Metastore
-                                         ↓
-📈 ML Models ← ⚡ PySpark ← 💾 MinIO Data Lake
-```
+![alt text](image.png)
 
 ### Komponen Utama:
 
