@@ -700,6 +700,12 @@
             ).toFixed(0)}% match</span>`
           : "";
 
+        // --- MODIFIKASI DIMULAI DI SINI ---
+        // Buat elemen gambar dengan placeholder jika URL tidak ada
+        const iconUrl = app.icon_url || 'https://via.placeholder.com/100x100.png?text=No+Icon';
+        const appIcon = `<img src="${iconUrl}" alt="${app.title} icon" class="app-icon me-3" style="width: 72px; height: 72px; border-radius: 15px; object-fit: cover; float: left;">`;
+        // --- MODIFIKASI SELESAI ---
+
         col.innerHTML = `
                 <div class="recommendation-card">
                     <div class="card-header">
@@ -709,15 +715,20 @@
                         </h6>
                     </div>
                     <div class="card-body">
-                        <h5 class="card-title text-primary">${app.title}</h5>
-                        <div class="mb-2">
-                            <span class="genre-tag">${app.genre}</span>
-                            ${priceTag}
+                        <!-- TAMBAHKAN GAMBAR DI SINI -->
+                        ${appIcon}
+                        <div style="overflow: hidden;"> <!-- Wrapper untuk teks agar tidak tumpang tindih dengan gambar -->
+                          <h5 class="card-title text-primary" style="margin-bottom: 0.25rem;">${app.title}</h5>
+                          <div class="mb-2">
+                              <span class="genre-tag">${app.genre}</span>
+                              ${priceTag}
+                          </div>
+                          <p class="text-muted mb-2" style="font-size: 0.9rem;">
+                              <i class="fas fa-user"></i> ${app.developer}
+                          </p>
                         </div>
-                        <p class="text-muted mb-2">
-                            <i class="fas fa-user"></i> ${app.developer}
-                        </p>
-                        <div class="mb-3">
+                        <div class="clearfix"></div> <!-- Clear float -->
+                        <div class="mt-3">
                             <div class="d-flex align-items-center mb-1">
                                 <div class="rating-stars me-2">${stars}</div>
                                 <small class="text-muted">${app.score.toFixed(
@@ -725,9 +736,9 @@
                                 )} (${app.ratings.toLocaleString()} reviews)</small>
                             </div>
                         </div>
-                        <p class="card-text">${
+                        <p class="card-text mt-2">${
                           app.summary
-                            ? app.summary.substring(0, 120) + "..."
+                            ? app.summary.substring(0, 100) + "..."
                             : "No description available"
                         }</p>
                     </div>

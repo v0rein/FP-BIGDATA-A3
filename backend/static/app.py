@@ -20,12 +20,16 @@ from sklearn.cluster import KMeans
 from sklearn.preprocessing import StandardScaler
 from sklearn.ensemble import RandomForestRegressor
 from scipy.sparse import load_npz
+from app_scraper import get_app_icons  # Custom scraper module
+from typing import List, Dict, Any
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-app = Flask(__name__)
+base_dir = os.path.dirname(os.path.abspath(__file__))
+template_dir = os.path.abspath(os.path.join(base_dir, "../templates"))
+app = Flask(__name__, template_folder=template_dir)
 CORS(app)  # Enable CORS for frontend integration
 
 # Global variables for loaded enhanced models
@@ -58,7 +62,8 @@ def load_models():
     global scaler, rf_model, lda_topics, nmf_features, count_vectorizer
 
     try:
-        models_dir = "models"
+        base_dir = os.path.dirname(os.path.abspath(__file__))
+        models_dir = os.path.abspath(os.path.join(base_dir, "../../models"))
 
         # Load enhanced apps data
         apps_path = os.path.join(models_dir, "apps_list_enhanced.pkl")
@@ -195,6 +200,7 @@ def get_recommendations_by_title(title, method='tfidf_basic', num_recommendation
             similarity_score = sim_scores[i][1]
 
             rec = {
+                'appId': app['appId'],
                 'title': app['title'],
                 'genre': app['genre'],
                 'developer': app['developer'],
@@ -280,6 +286,7 @@ def get_recommendations_hybrid(title, num_recommendations=10):
             app = apps_df.iloc[app_idx]
 
             rec = {
+                'appId': app['appId'],
                 'title': app['title'],
                 'genre': app['genre'],
                 'developer': app['developer'],
@@ -343,6 +350,7 @@ def get_recommendations_by_cluster(title, num_recommendations=10):
         recommendations = []
         for _, app in cluster_apps.head(num_recommendations).iterrows():
             rec = {
+                'appId': app['appId'],
                 'title': app['title'],
                 'genre': app['genre'],
                 'developer': app['developer'],
@@ -402,6 +410,7 @@ def get_recommendations_by_genre(genre, num_recommendations=10):
         recommendations = []
         for _, app in top_apps.iterrows():
             rec = {
+                'appId': app['appId'],
                 'title': app['title'],
                 'genre': app['genre'],
                 'developer': app['developer'],
@@ -458,6 +467,7 @@ def get_popular_apps(num_recommendations=10):
         recommendations = []
         for _, app in top_apps.iterrows():
             rec = {
+                'appId': app['appId'],
                 'title': app['title'],
                 'genre': app['genre'],
                 'developer': app['developer'],
@@ -490,9 +500,47 @@ def get_popular_apps(num_recommendations=10):
         logger.error(f"Error in get_popular_apps: {e}")
         return {"error": str(e)}
 
+def add_icons_to_apps(app_data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """
+    Fungsi jembatan untuk mengambil ikon aplikasi menggunakan scraper dan menambahkannya ke data.
+    """
+    if not app_data:
+        return []
+
+    # 1. Siapkan data untuk scraper. Scraper Anda membutuhkan 'app_id' dan 'title'.
+    apps_to_fetch = []
+    for app in app_data:
+        # Pastikan data memiliki 'appId' dan 'title'
+        # Proyek teman Anda sepertinya sudah konsisten menggunakan 'title'.
+        # Kita perlu memastikan 'appId' ada.
+        if 'appId' in app and 'title' in app:
+            apps_to_fetch.append({
+                'app_id': app['appId'], # Scraper Anda butuh 'app_id'
+                'title': app['title']
+            })
+
+    if not apps_to_fetch:
+        # Jika tidak ada data valid, kembalikan data asli
+        return app_data
+
+    # 2. Panggil scraper dengan data yang sudah disiapkan
+    # get_app_icons akan mengembalikan map: {'com.whatsapp': 'url_gambar', ...}
+    logging.info(f"Fetching icons for {len(apps_to_fetch)} apps...")
+    icon_urls_map = get_app_icons(apps_to_fetch)
+    logging.info("Icon fetching complete.")
+    
+    # 3. Update data aplikasi asli dengan URL ikon yang didapat
+    for app in app_data:
+        app_id = app.get('appId')
+        if app_id and app_id in icon_urls_map:
+            app['icon_url'] = icon_urls_map[app_id]
+        else:
+            # Pastikan ada field 'icon_url' meskipun gagal, untuk konsistensi di frontend
+            app['icon_url'] = None
+            
+    return app_data
+
 # API Routes
-
-
 @app.route('/')
 def home():
     """Home page"""
@@ -584,6 +632,17 @@ def recommend_by_title():
         if 'error' in result:
             return jsonify(result), 404
 
+        # --- INTEGRASI DIMULAI DI SINI ---
+        # Ambil daftar rekomendasi dari hasil
+        recommendations_list = result.get('recommendations', [])
+        
+        # Panggil fungsi jembatan kita untuk menambahkan URL ikon
+        recommendations_with_icons = add_icons_to_apps(recommendations_list)
+        
+        # Masukkan kembali daftar yang sudah diperbarui ke dalam hasil
+        result['recommendations'] = recommendations_with_icons
+        # --- INTEGRASI SELESAI ---
+
         return jsonify(result)
 
     except Exception as e:
@@ -611,6 +670,17 @@ def recommend_hybrid():
         if 'error' in result:
             return jsonify(result), 404
 
+        # --- INTEGRASI DIMULAI DI SINI ---
+        # Ambil daftar rekomendasi dari hasil
+        recommendations_list = result.get('recommendations', [])
+        
+        # Panggil fungsi jembatan kita untuk menambahkan URL ikon
+        recommendations_with_icons = add_icons_to_apps(recommendations_list)
+        
+        # Masukkan kembali daftar yang sudah diperbarui ke dalam hasil
+        result['recommendations'] = recommendations_with_icons
+        # --- INTEGRASI SELESAI ---
+        
         return jsonify(result)
 
     except Exception as e:
@@ -637,6 +707,17 @@ def recommend_by_cluster():
 
         if 'error' in result:
             return jsonify(result), 404
+        
+        # --- INTEGRASI DIMULAI DI SINI ---
+        # Ambil daftar rekomendasi dari hasil
+        recommendations_list = result.get('recommendations', [])
+        
+        # Panggil fungsi jembatan kita untuk menambahkan URL ikon
+        recommendations_with_icons = add_icons_to_apps(recommendations_list)
+        
+        # Masukkan kembali daftar yang sudah diperbarui ke dalam hasil
+        result['recommendations'] = recommendations_with_icons
+        # --- INTEGRASI SELESAI ---
 
         return jsonify(result)
 
@@ -664,6 +745,17 @@ def recommend_by_genre():
 
         if 'error' in result:
             return jsonify(result), 404
+        
+        # --- INTEGRASI DIMULAI DI SINI ---
+        # Ambil daftar rekomendasi dari hasil
+        recommendations_list = result.get('recommendations', [])
+        
+        # Panggil fungsi jembatan kita untuk menambahkan URL ikon
+        recommendations_with_icons = add_icons_to_apps(recommendations_list)
+        
+        # Masukkan kembali daftar yang sudah diperbarui ke dalam hasil
+        result['recommendations'] = recommendations_with_icons
+        # --- INTEGRASI SELESAI ---
 
         return jsonify(result)
 
@@ -686,6 +778,17 @@ def recommend_popular():
 
         if 'error' in result:
             return jsonify(result), 500
+        
+        # --- INTEGRASI DIMULAI DI SINI ---
+        # Ambil daftar rekomendasi dari hasil
+        recommendations_list = result.get('recommendations', [])
+        
+        # Panggil fungsi jembatan kita untuk menambahkan URL ikon
+        recommendations_with_icons = add_icons_to_apps(recommendations_list)
+        
+        # Masukkan kembali daftar yang sudah diperbarui ke dalam hasil
+        result['recommendations'] = recommendations_with_icons
+        # --- INTEGRASI SELESAI ---
 
         return jsonify(result)
 
@@ -828,6 +931,7 @@ def search_apps_enhanced():
         results = []
         for _, app in matches.iterrows():
             result = {
+                'appId': app['appId'],
                 'title': app['title'],
                 'genre': app['genre'],
                 'developer': app['developer'],
